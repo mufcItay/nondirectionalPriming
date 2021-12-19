@@ -7,14 +7,15 @@ data = readtable(fullfile('data',[filename,'.csv']));
 data.subNum = double(categorical(data.subNum)); %make it a number
 exp_names = unique(data.Exp);
 
-% we are only interested in trials where the participant corredctly
-% identified the target
-% data = data(data.correct==1,:);
+% should we filter trials?
+if params.filter_column
+    data = data(data.(params.filter_column)==params.inclusion_value,:);
+end
 
 if length(params.control_for)>1
-% create a column for the residual variance in rt after controlling for
+% create a column for the residual variance in x after controlling for
 % the control_for field
-    rt_residuals = [];
+    residuals = [];
 
     for i_e=1:length(exp_names)
 
@@ -25,16 +26,16 @@ if length(params.control_for)>1
 
             subj_data = exp_data(exp_data.subNum==i_s,:);
 
-            rt = subj_data.rt;
+            x = subj_data.(params.x);
             control_for_str = subj_data.(params.control_for);
             control_for_bin = double(strcmp(control_for_str,control_for_str{1}));
-            p=polyfit(control_for_bin,rt,1);
-            rt_residuals=[rt_residuals;rt-polyval(p,control_for_bin)];
+            p=polyfit(control_for_bin,x,1);
+            residuals=[residuals;x-polyval(p,control_for_bin)];
         end
     end
-    data.x = rt_residuals;
+    data.x = residuals;
 else
-    data.x = data.rt;
+    data.x = data.(params.x);
 end
 
 % MAIN LOOP
@@ -85,12 +86,12 @@ for i_e=1:length(exp_names)
         
         if params.signConsistency
             %true sign consistency for subject
-            exp_consistency(i_s)=getSignConsistency(x,y,params.N_splits);
+            exp_consistency(i_s)=getSignConsistency(x,y,params.N_splits,params.statistic);
         end
         
         if params.directional
             %true difference in depndent measure per participant
-            exp_diff(i_s) = median(x(y==0))-median(x(y==1));
+            exp_diff(i_s) = params.statistic(x(y==0))-params.statistic(x(y==1));
         end
         
         % shuffled accuracy for subject
@@ -105,11 +106,11 @@ for i_e=1:length(exp_names)
             end
             
             if params.signConsistency
-                exp_shuffled_consistency(i_s,i_p)=getSignConsistency(shuffled_x,y,params.N_splits);
+                exp_shuffled_consistency(i_s,i_p)=getSignConsistency(shuffled_x,y,params.N_splits,params.statistic);
             end
             
             if params.directional
-                exp_shuffled_diff(i_s,i_p)=median(shuffled_x(y==0))-median(shuffled_x(y==1));
+                exp_shuffled_diff(i_s,i_p)=params.statistic(shuffled_x(y==0))-params.statistic(shuffled_x(y==1));
             end
         end
         
@@ -177,7 +178,7 @@ for i_e=1:length(exp_names)
         hold on;
         histogram(diff_null_distribution,'Normalization','probability','DisplayStyle','stairs');
         xline(nanmean(exp_diff),'LineWidth',1);
-        xlabel('mean difference between medians');
+        xlabel('mean difference');
         ylabel('probability')
         title(sprintf('%s: p=%.3f','Directional test',diff_p))
 
@@ -189,7 +190,10 @@ for i_e=1:length(exp_names)
     s.Height = 8;
     
     % save
-    dir_name = fullfile('.','analyzed',filename,exp_names{i_e});
+    dir_name = fullfile('.','analyzed',filename,exp_names{i_e},params.x);
+    if length(params.filter_column)>0
+        dir_name = fullfile(dir_name,['filtering_by_',params.filter_column]);
+    end
     if length(params.control_for)>0
         dir_name = fullfile(dir_name,['controlling_for_',params.control_for]);
     end

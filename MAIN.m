@@ -14,11 +14,16 @@ params.rng = 1;
 params.N_splits = 500; %for sign consistency analysis
 params.control_for = ''; 
 params.predict = 'cong'; 
+params.x = 'accuracy';
+params.filter_column = '';
+% params.inclusion_value = 1; %for filtering;
 
 params.SVM = true;
 params.signConsistency = true;
 params.directional = true;
-filename = 'SimulatedNull_Data_Full';
+
+params.statistic = @(x) mean(x);
+filename = 'Hess_NP_Data_Full';
 
 analyzePriming(params,filename);
 
