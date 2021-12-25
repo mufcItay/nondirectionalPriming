@@ -3,6 +3,8 @@ function [signConsistency] = getSignConsistencyMetacognition(confidence,label,ac
 if length(confidence) ~= length(label)
     error('inconsistent lengths for vectors RT and label')
 end
+
+
 Ntrials = length(confidence);
 midpoint = round(Ntrials/2);
 consistency=nan(Nsplits,1);
@@ -24,6 +26,6 @@ for i_s = 1:Nsplits
     consistency(i_s)=group0_sign==group1_sign;
 
 end
-signConsistency=mean(consistency);
+signConsistency=nanmean(consistency);
 end
 

@@ -120,7 +120,7 @@ if params.directional
         for i_s = exp_ss'
             sample(end+1)=exp_shuffled_diff(i_s,randperm(params.N_perm,1));
         end
-        diff_null_distribution(end+1)=nanmean(sample);
+        diff_null_distribution(end+1)=mean(sample);
     end
 
     diff_p = mean(diff_null_distribution>=nanmean(exp_diff));
