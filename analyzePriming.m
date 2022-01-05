@@ -69,7 +69,7 @@ for i_e=1:length(exp_names)
         
         x = subj_data.x;
 
-        y_str = subj_data.(params.predict);
+        y_str = sort(subj_data.(params.predict));
         y = strcmp(y_str,y_str{1});
         
         k = min(sum(y==0),sum(y==1));
