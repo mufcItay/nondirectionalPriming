@@ -66,10 +66,9 @@ for i_e=1:length(exp_names)
         find(exp_ss==i_s)/length(exp_ss)
         
         subj_data = exp_data(exp_data.subNum==i_s,:);
-        
-        x = subj_data.x;
+        [y_str, ord_y] = sort(subj_data.(params.predict));
 
-        y_str = flip(sort(subj_data.(params.predict)));
+        x = subj_data.x(ord_y);
         y = strcmp(y_str,y_str{1});
         
         k = min(sum(y==0),sum(y==1));
