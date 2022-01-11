@@ -66,10 +66,9 @@ for i_e=1:length(exp_names)
         find(exp_ss==i_s)/length(exp_ss)
         
         subj_data = exp_data(exp_data.subNum==i_s,:);
-        
-        x = subj_data.x;
-
-        y_str = sort(subj_data.(params.predict));
+        [y_str, ord_y] = sort(subj_data.(params.predict));
+        y_str = string(y_str);    
+        x = subj_data.x(ord_y);
         y = strcmp(y_str,y_str{1});
         
         k = min(sum(y==0),sum(y==1));
@@ -184,7 +183,8 @@ for i_e=1:length(exp_names)
 
     end
     
-    s=hgexport('readstyle','presentation');
+%     s=hgexport('readstyle','presentation');
+    s=hgexport('factorystyle');
     s.Format = 'png';
     s.Width = 8;
     s.Height = 8;

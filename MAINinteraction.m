@@ -17,14 +17,15 @@ params.predict = 'cong';
 params.x = 'rt';
 params.filter_column = '';
 % params.inclusion_value = 1; %for filtering;
+params.interaction_cond = 'Inter';
 
 params.SVM = true;
 params.signConsistency = true;
 params.directional = true;
 
 params.statistic = @(x) mean(x);
-filename = 'Forti_Humphreys';
+filename = 'Yap_Colleagues_inter';
 
-analyzePriming(params,filename);
+analyzeInteraction(params,filename);
 
 
