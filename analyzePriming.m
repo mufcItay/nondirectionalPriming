@@ -67,7 +67,7 @@ for i_e=1:length(exp_names)
         
         subj_data = exp_data(exp_data.subNum==i_s,:);
         [y_str, ord_y] = sort(subj_data.(params.predict));
-
+        y_str = string(y_str);    
         x = subj_data.x(ord_y);
         y = strcmp(y_str,y_str{1});
         
@@ -183,7 +183,8 @@ for i_e=1:length(exp_names)
 
     end
     
-    s=hgexport('readstyle','presentation');
+%     s=hgexport('readstyle','presentation');
+    s=hgexport('factorystyle');
     s.Format = 'png';
     s.Width = 8;
     s.Height = 8;
