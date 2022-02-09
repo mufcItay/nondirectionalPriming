@@ -35,12 +35,12 @@ filename = 'PKTE';
 % a table including the results of all analysis iterations
 resAll = table;
 NAnalysisIterations = 20;
-% perform the analysis iteratively, each time with a differeng random generator
+% perform the analysis iteratively, each time with a different random generator
 for ind=1:NAnalysisIterations
     params.rng = ind;
     res = analyzePriming(params,filename);
     res.rng = ind;
-    % concatenate previous analysis resutls with the curret results
+    % concatenate previous analysis resutls with the current results
     resAll = vertcat(resAll, res);
 end
 writetable(resAll, cat('analysisResults_N', string(params.filterN),...
