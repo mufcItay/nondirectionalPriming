@@ -22,9 +22,26 @@ params.SVM = true;
 params.signConsistency = true;
 params.directional = true;
 
+% filter function to enable subsetting the data of the experiment
+% differently in each analysis iteration
+% N of included subjects for analysis
+params.filterN = 15; 
+% gets the total number of subjects 'N' and the required N, and filters
+% randomly
+params.filterFunc = @(N, filterN) randsample(N, filterN); 
+
 params.statistic = @(x) mean(x);
-filename = 'Forti_Humphreys';
-
-analyzePriming(params,filename);
-
-
+filename = 'PKTE';
+% a table including the results of all analysis iterations
+resAll = table;
+NAnalysisIterations = 20;
+% perform the analysis iteratively, each time with a differeng random generator
+for ind=1:NAnalysisIterations
+    params.rng = ind;
+    res = analyzePriming(params,filename);
+    res.rng = ind;
+    % concatenate previous analysis resutls with the curret results
+    resAll = vertcat(resAll, res);
+end
+writetable(resAll, cat('analysisResults_N', string(params.filterN),...
+    '_Iter_',string(NAnalysisIterations),'.csv'));
