@@ -1,0 +1,34 @@
+close all;
+clc;
+clear;
+warning('off')
+
+% Stelzer, J., Chen, Y., & Turner, R. (2013). 
+% Statistical inference and multiple testing correction in 
+% classification-based multi-voxel pattern analysis (MVPA): 
+% random permutations and cluster size control. Neuroimage, 65, 69-82.
+params.N_perm = 25; %number of label shuffling per participant
+params.N_null = 10000; %number of samples in bootstrapped null distribution
+params.rng = 1;
+
+params.N_splits = 500; %for sign consistency analysis
+params.control_for = ''; 
+params.predict = 'cong'; 
+params.x = 'rt';
+params.filter_column = '';
+% params.inclusion_value = 1; %for filtering;
+
+params.SVM = true;
+params.signConsistency = true;
+params.directional = true;
+
+
+params.filterN = 10;
+params.filterFunc = @(data, N) data(randperm(length(data)))(1:N))); 
+
+params.statistic = @(x) mean(x);
+filename = 'PKTE';
+
+analyzePriming(params,filename);
+
+
