@@ -30,11 +30,12 @@ params.filterN = 15;
 % randomly
 params.filterFunc = @(N, filterN) randsample(N, filterN); 
 
+params.plot = false;
 params.statistic = @(x) mean(x);
 filename = 'PKTE';
 % a table including the results of all analysis iterations
 resAll = table;
-NAnalysisIterations = 20;
+NAnalysisIterations = 100;
 % perform the analysis iteratively, each time with a different random generator
 for ind=1:NAnalysisIterations
     params.rng = ind;
@@ -43,5 +44,5 @@ for ind=1:NAnalysisIterations
     % concatenate previous analysis resutls with the current results
     resAll = vertcat(resAll, res);
 end
-writetable(resAll, cat('analysisResults_N', string(params.filterN),...
+writetable(resAll, strcat('analysisResults_N', string(params.filterN),...
     '_Iter_',string(NAnalysisIterations),'.csv'));

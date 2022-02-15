@@ -54,7 +54,7 @@ function [resultsTable] = analyzePriming(params,filename)
 
         exp_data = data(strcmp(data.Exp,exp),:);
         exp_ss = unique(exp_data.subNum);
-
+        exp_var = nan(max(exp_ss),1);
         if params.SVM
             exp_acc = nan(max(exp_ss),1);
             exp_shuffled_acc = nan(max(exp_ss),params.N_perm);
@@ -75,13 +75,16 @@ function [resultsTable] = analyzePriming(params,filename)
             find(exp_ss==i_s)/length(exp_ss)
 
             subj_data = exp_data(exp_data.subNum==i_s,:);
+            
             [y_str, ord_y] = sort(subj_data.(params.predict));
             y_str = string(y_str);    
             x = subj_data.x(ord_y);
             y = strcmp(y_str,y_str{1});
 
+            % calculate within subject variaibility
+            exp_var(i_s) = mean([nanvar(x(y==0)) nanvar(x(y==1))]);
+            
             k = min(sum(y==0),sum(y==1));
-
             if params.SVM & k>=10
 
                 SVMModel = fitcsvm(x,y,'Standardize',true,'ClassNames',[0,1]);
@@ -123,8 +126,15 @@ function [resultsTable] = analyzePriming(params,filename)
             end
 
         end
-
-        fig=figure;
+        % save within, between variability and the ratio between/within 
+        resultsTable.BTW_Var = nanvar(exp_diff);
+        resultsTable.WITHIN_Var = nanmean(exp_var);
+        resultsTable.Var_Ratio = resultsTable.BTW_Var / resultsTable.WITHIN_Var;
+        if params.plot == false
+            fig= figure('visible','off');
+        else
+            fig=figure;
+        end
         if params.SVM
             %create null distribution
             SVM_null_distribution = [];
@@ -140,6 +150,7 @@ function [resultsTable] = analyzePriming(params,filename)
             acc_p = mean(SVM_null_distribution>=nanmean(exp_acc));
             resultsTable.SVM_exp_mean = nanmean(exp_acc);
             resultsTable.SVM_p = acc_p;
+            
             subplot(2,2,1)
             hold on;
             histogram(SVM_null_distribution,'Normalization','probability','DisplayStyle','stairs');
